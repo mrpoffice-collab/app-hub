@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>My Apps</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+    .header {
+      position: sticky;
+      top: 0;
+      background: #16213e;
+      padding: 16px;
+      border-bottom: 1px solid #0f3460;
+      z-index: 100;
+    }
+    .header h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #e94560;
+    }
+    .search {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 2px solid #0f3460;
+      border-radius: 12px;
+      background: #1a1a2e;
+      color: #eee;
+      outline: none;
+    }
+    .search:focus {
+      border-color: #e94560;
+    }
+    .search::placeholder {
+      color: #666;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab {
+      padding: 8px 16px;
+      background: #0f3460;
+      border: none;
+      border-radius: 20px;
+      color: #aaa;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #e94560;
+      color: white;
+    }
+    .content {
+      padding: 16px;
+    }
+    .category {
+      margin-bottom: 24px;
+    }
+    .category-title {
+      font-size: 14px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+    .app-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .app-card {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .app-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .app-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #eee;
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .app-url {
+      font-size: 12px;
+      color: #666;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .app-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn-copy {
+      background: #0f3460;
+      color: #aaa;
+    }
+    .btn-copy.copied {
+      background: #27ae60;
+      color: white;
+    }
+    .btn-sms {
+      background: #e94560;
+      color: white;
+    }
+    .btn-open {
+      background: #0f3460;
+      color: #4fc3f7;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #27ae60;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 200;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #16213e;
+      border-top: 1px solid #0f3460;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+    }
+    .footer-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .footer-btn.primary {
+      background: #e94560;
+      color: white;
+    }
+    .footer-btn.secondary {
+      background: #0f3460;
+      color: #aaa;
+    }
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+    .count {
+      font-size: 12px;
+      color: #666;
+      padding: 8px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🚀 My Apps</h1>
+    <input type="search" class="search" id="search" placeholder="Search all apps..." autocomplete="off">
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="content" id="content"></div>
+
+  <div class="toast" id="toast">Link copied!</div>
+
+  <div class="footer">
+    <button class="footer-btn secondary" onclick="location.reload()">Refresh</button>
+    <button class="footer-btn primary" onclick="addToHome()">Add to Home</button>
+  </div>
+
+  <script>
+    // ============================================
+    // APP REGISTRY - Add your apps here!
+    // ============================================
+    const MY_APPS = [
+      // Standalone Apps
+      { name: "Micro CRM", url: "https://track-my-client.vercel.app", category: "Business" },
+      { name: "Firefly Grove", url: "https://firefly-grove.vercel.app", category: "Creative" },
+      { name: "Whisper Journals", url: "https://whisper-journals.vercel.app", category: "Personal" },
+      { name: "Whispering Art", url: "https://whispering-art.vercel.app", category: "Creative" },
+      { name: "Code63 Art", url: "https://code63-art.vercel.app", category: "Creative" },
+      { name: "Rythym", url: "https://rythym.vercel.app", category: "Music" },
+
+      // Code63 Apps Portal
+      { name: "Code63 Apps (555+ tools)", url: "https://code63apps.com", category: "Tools" },
+      { name: "Share Hub", url: "https://code63apps.com/share", category: "Tools" },
+    ];
+
+    // Code63 individual apps - loaded dynamically
+    const CODE63_APPS = ["age-calculator","bmi-calculator","tip-splitter-pro","band-name-generator","aspect-ratio-calculator","529-contribution-calculator","ac-size-calculator","affirmation-shuffler","anagram-solver","ascii-art-generator","base64-encoder-decoder","bpm-tapper","breathing-exercise-guide","box-shadow-generator","caffeine-half-life-tracker","car-depreciation-visualizer","bowling-score-calculator","butter-to-oil-converter","capsule-wardrobe-builder","bio-generator-by-platform","bionic-reading-converter","board-game-scorer","bucket-list-shuffler","break-timer-stretches","box-packing-calculator","carbon-footprint-estimator","case-converter","citation-generator","coffee-ratio-calculator","color-contrast-checker","color-palette-from-image","compliment-generator","compound-interest-visualizer","conception-calculator","context-switching-calculator","closing-cost-calculator","cliche-finder","currency-converter","dad-joke-generator","date-idea-spinner","decision-dice","debt-payoff-strategy","cooking-unit-converter","daily-focus-planner","deadline-countdown-dashboard","decision-fatigue-reducer","crypto-unit-converter","csv-column-mapper","deep-work-session-logger","debate-topic-generator","declutter-decision-tree","egg-timer","eisenhower-matrix","electricity-cost-calculator","email-subject-tester","emoji-puzzle","emotion-wheel","epoch-converter","essay-word-counter","excuse-generator","fantasy-name-generator","feature-request-prioritizer","fire-calculator","flashcard-maker","freelance-rate-calculator","fortune-cookie-writer","focus-score-calculator","frame-rate-converter","fun-fact-generator","gpa-calculator","grade-calculator","gradient-generator","gratitude-jar","habit-stack-builder","hangman","headline-analyzer","hiit-timer","home-renovation-budget","golden-hour-calculator","gift-budget-tracker","invoice-generator","job-search-tracker","journal-prompt-spinner","jwt-decoder","lorem-ipsum-variants","magic-8-ball","macro-splitter","meeting-cost-calculator","meat-temperature-guide","medication-schedule-builder","interview-question-bank","jet-lag-calculator","mindful-minute","mood-logger","monogram-maker","mortgage-refinance-calculator","morning-routine-builder","nap-calculator","number-memory","metronome-subdivisions","moon-phase-calculator","agenda-time-allocator","allowance-tracker","alt-text-generator-helper","ancestor-timeline","anhedonia-activity-log","annual-to-monthly-converter","appliance-age-calculator","appliance-age-decoder","appointment-prep-checklist","aspect-ratio-cropper","aspect-ratio-safe-areas","audio-normalization-reference","baby-nap-tracker","baking-altitude-adjuster","basic-needs-checklist","batch-task-grouper","batna-clarifier","battleship-pencil-game","body-double-timer","body-scan-timer","book-club-manager","boundary-script-generator","brush-timer-quadrants","business-break-even-analyzer","car-ride-bingo","car-total-cost-calculator","cash-envelope-digital","cell-structure-explorer","charitable-donation-tracker","chemical-equation-balancer","chinese-checkers","client-hours-tracker","cognitive-distortion-spotter","collage-layout-generator","college-cost-comparator","color-blind-simulator","color-memory","color-mixing-predictor","color-season-quiz","commitment-inventory","companion-planting-guide","compost-ratio-calculator","concentration-game","contract-clause-generator","contraction-timer","contract-red-flag-scanner","contrast-cop","conversation-deepener","cookie-texture-adjuster","cooking-time-calculator","coping-card-deck","cornell-notes-template","country-flag-quiz","crochet-hook-converter","crop-rotation-planner","daily-wins-journal","daily-word-ladder","days-to-harvest-calculator","dca-simulator","dental-visit-timer","depth-of-field-calculator","dew-point-calculator","dietary-restriction-translator","digital-asset-checklist","distraction-blocker-log","dividend-reinvestment-projector","dnd-encounter-builder","done-list-generator","dots-and-boxes","drawing-proportion-guide","drug-interaction-checker","duotone-image-maker","dyslexia-friendly-reader","earthquake-magnitude-comparator","egg-substitute-guide","emergency-info-card","employee-true-cost-calculator","energy-level-tracker","energy-management-planner","eob-decoder","estate-planning-worksheet","estimate-game","estimation-calibrator","evening-shutdown-checklist","fake-movie-plot-generator","fake-text-generator","fall-risk-checklist","favicon-previewer","fence-post-calculator","fertilizer-calculator","fiber-intake-tracker","filament-calculator","focal-length-comparator","font-snapper","fox-and-geese","freezer-inventory","frequency-to-note","friendship-compatibility","frost-date-calculator","fuel-economy-logger","funeral-cost-estimator","furniture-fit-calculator","garden-bed-planner","garden-budget-tracker","garden-journal","garden-pest-identifier","gas-fee-estimator","goal-progress-dashboard","golf-handicap-estimator","grief-wave-timer","grounding-5-4-3-2-1","grounding-timer","growth-percentile-tracker","guest-list-manager","halloween-costume-randomizer","harvest-tracker","hashtag-combiner","heat-index-wind-chill","high-contrast-tester","higher-lower","house-affordability-reverse","human-body-systems-explorer","image-cropper-resizer","inbox-zero-tracker","infill-comparison-chart","ingredient-swapper","initiative-tracker","instant-pot-timer-guide","insurance-deductible-tracker","interview-quote-cleaner","investment-portfolio-analyzer","iss-pass-predictor","keyboard-music-pad","key-finder","kick-counter","klondike-solitaire","lease-red-flag-scanner","led-resistor-calculator","leftover-remix-ideas","leftovers-timer","legal-fee-estimator","life-advice-randomizer","ludo","luggage-weight-calculator","mancala","marinade-time-guide","marketing-roi-dashboard","meat-thaw-calculator","medication-reminder-log","meeting-notes-structure","meeting-stage-timer","meme-template-editor","mental-math-chains","menu-price-inflation-tracker","micronutrient-gap-finder","minimal-pairs-trainer","mise-en-place-generator","mood-tracker-context","mortgage-payoff-scenarios","most-likely-to","move-in-checklist","mtg-life-counter","mulch-calculator","multiplication-sprint","nda-generator","never-have-i-ever","new-year-resolution-tracker","nim","nine-mens-morris","number-sense-builder","nursing-timer","nutrition-meal-designer","obituary-template-helper","oil-change-tracker","old-maid","one-in-one-out-tracker","one-rm-calculator","one-thing-focus-mode","outfit-randomizer","packing-list-generator","paint-coverage","palette-from-image","pan-size-converter","parking-meter-reminder","parking-spot-saver","parking-timer","password-generator","pasta-water-ratio","pdf-merge-order-planner","peg-solitaire","percentage-calculator","percentage-trainer","periodic-table-explorer","period-tracker-lite","perspective-grid-generator","pet-age-converter","pet-name-generator","ph-scale-visualizer","physics-formula-calculator","pick-up-sticks","pirate-name-generator","pitch-shifter-preview","pixel-art-canvas","pixel-art-scaler","planet-visibility-tonight","planting-calendar","plant-spacing-calculator","plant-watering-reminder","plot-twist-generator","podcast-episode-calculator","pool-chemical-calculator","post-character-counter","power-outage-tracker","price-history-template","print-bed-leveling-helper","print-size-calculator","procrastination-pattern-logger","product-expiration-tracker","product-pricing-matrix","project-milestone-tracker","property-tax-estimator","pruning-calendar","qr-code-generator","quarterly-tax-calculator","quick-capture-inbox","quote-card-designer","random-challenge-generator","reaction-time-test","readability-scorer","recipe-card-maker","recipe-cost-calculator","recipe-nutrition-estimator","recipe-scaler","recycling-guide","referee-signal-guide","relationship-calculator","relationship-timeline","rent-affordability","response-time-tracker","restaurant-wait-estimator","resume-bullet-improver","retirement-readiness-checker","roast-generator","rock-and-mineral-identifier","roommate-expense-splitter","salary-negotiation-script-builder","sample-rate-converter","scope-creep-tracker","screen-break-reminder","screen-reader-preview","screen-time-timer","seasonal-garden-tasks","seating-chart-builder","secret-santa-generator","seed-inventory-manager","seed-starting-calculator","self-care-bingo","self-care-hard-days","self-compassion-prompt","sensory-diet-planner","setlist-builder","shakespearean-insult-generator","shot-clock-trainer","shower-thought-generator","show-notes-template","shut-the-box","side-hustle-profit-calculator","silence-timer","simple-circuits-simulator","sinking-fund-calculator","skincare-routine-builder","sleep-cycle-calculator","sleep-quality-rater","slide-count-calculator","slow-cooker-converter","smoke-point-reference","snakes-and-ladders","sobriety-day-counter","social-battery-meter","social-media-image-sizer","social-script-library","solar-system-scale-model","solunar-calculator","someday-maybe-list","sourdough-calculator","speech-pace-monitor","speech-timer-warnings","spice-blend-builder","spider-solitaire","spirit-animal-quiz","spreadsheet-formula-explainer","spring-cleaning-checklist","standing-desk-reminder","star-map-generator","startup-name-generator","statute-of-limitations-lookup","stim-tracker","stitch-counter","stock-options-analyzer","stock-split-calculator","streak-keeper","stream-title-generator","stress-thermometer","study-timer","subscriber-milestone-calculator","subscription-roi-calculator","succession-planting-scheduler","sun-exposure-tracker","sunset-countdown","supplement-interaction-checker","supplement-timing-guide","symptom-journal","tabata-timer","task-breakdown-helper","tax-deduction-optimizer","tax-withholding-estimator","tea-steeping-timer","text-spacing-adjuster","thanksgiving-calculator","this-or-that","thought-record","tile-calculator","time-audit-logger","time-blocking-generator","time-capsule-creator","timezone-meeting-planner","timezone-overlap-finder","tip-quality-rater","tire-rotation-reminder","tooth-fairy-calculator","transition-alert-system","transplant-hardening-schedule","trigger-log","trigger-pattern-logger","trip-budget-planner","trip-budget-splitter","twenty-questions","two-minute-rule-timer","two-truths-one-lie","unsubscribe-link-finder","urge-surfing-timer","useless-superpower-generator","uv-index-explainer","vaccine-schedule-reference","vegetable-yield-estimator","video-bitrate-calculator","vin-decoder-display","vinyl-value-calculator","vision-prescription-explainer","vod-timestamp-marker","waiting-for-list","waiting-mode-escape-hatch","wallet-address-validator","war-card-game","water-intake-calculator","watermark-generator","wedding-budget-allocator","wedding-budget-manager","weekly-planning-template","weekly-reflection-prompts","weekly-review-checklist","weird-holiday-finder","wire-gauge-reference","word-chain","word-counter","word-to-reading-time","worry-dump","would-you-rather-generator","would-you-rather-kids","writing-prompt-wheel","yacht","yeast-type-converter","zettelkasten-id-generator","guest-question-prep","hair-growth-tracker","hair-wash-day-calculator","memory-jar-digital","patch-test-timer","paycheck-breakdown","soil-ph-guide","daily-standup-logger","side-project-idea-scorer","recurring-bill-calendar","subscription-tracker","pantry-inventory","learning-goal-tracker","pet-care-scheduler","home-maintenance-log","movie-watchlist","gift-idea-vault","contact-check-in","skill-practice-logger","warranty-tracker","volunteer-hours-tracker","package-delivery-tracker","skill-barter-tracker","homebrew-abv-calculator","aquarium-stock-calculator","yarn-project-estimator","candle-making-calculator","soap-making-calculator","resin-mix-calculator","pottery-shrinkage-calculator","leather-cut-calculator","embroidery-thread-calculator","fermentation-tracker","rv-payload-calculator","boat-fuel-estimator","bike-fit-calculator","running-pace-calculator","swim-workout-builder","deck-board-calculator","lawn-overseed-calculator","hot-tub-chemical-calculator","firewood-calculator","snow-removal-estimator","deal-price-tracker","allergy-ingredient-checker","gift-occasion-reminder","appliance-energy-calculator","moving-box-inventory","garage-sale-pricer","room-dimension-logger","commute-time-logger","article-reading-list","book-club-manager","dream-life-visualizer","five-year-vision-map","monthly-intention-setter","word-of-the-year","life-wheel-assessment","ideal-day-designer","future-self-letter","manifestation-script","vision-board-collage","abundance-log","affirmation-creator","milestone-roadmap","core-values-ranker","purpose-statement-craft","dream-career-mapper","relationship-vision","financial-freedom-map","wellness-vision","travel-dream-tracker","dream-home-planner","legacy-vision","quarterly-intentions","hundred-dreams-tracker","wins-celebration-log","possibility-explorer","identity-affirmations","fear-to-goal-converter","belief-reframer","daily-intention-draw","limiting-beliefs-assessment","am-i-enough-quiz","confidence-score-calculator","imposter-syndrome-checker","money-mindset-quiz","self-sabotage-identifier","negative-self-talk-counter","anxiety-level-assessment","people-pleaser-quiz","perfectionism-assessment","fear-of-success-quiz","fear-of-rejection-quiz","attachment-style-quiz","inner-critic-coach-quiz","self-compassion-score","core-belief-discovery","procrastination-type-quiz","worthiness-assessment","emotional-triggers-assessment","life-satisfaction-wheel","meal-kit-savings-calculator","dinner-rut-quiz","cooking-confidence-quiz","food-waste-calculator","cuisine-preference-quiz","grocery-trip-calculator","meal-variety-score","portion-size-calculator","weeknight-dinner-quiz","ingredient-freshness-guide","family-meal-budget","meal-prep-time-estimator","dinner-decision-maker","diet-compatibility-quiz","takeout-spending-tracker","llc-vs-sole-prop-quiz","business-readiness-quiz","side-hustle-to-business-quiz","logo-style-quiz","brand-personality-quiz","target-audience-finder","business-idea-validator","entrepreneur-type-quiz","startup-cost-estimator","business-license-checklist","brand-color-psychology","tagline-generator","elevator-pitch-builder","competitor-analysis-tool","business-plan-outline","freelancer-to-founder-quiz","brand-voice-finder","niche-market-finder","business-entity-comparison","first-year-revenue-calculator"];
+
+    // Combine all apps
+    let allApps = [...MY_APPS];
+
+    // Add Code63 apps with proper URLs
+    if (Array.isArray(CODE63_APPS) && CODE63_APPS.length > 0) {
+      CODE63_APPS.forEach(slug => {
+        allApps.push({
+          name: formatName(slug),
+          url: `https://code63apps.com/apps/${slug}`,
+          category: "Code63"
+        });
+      });
+    }
+
+    function formatName(slug) {
+      return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    // State
+    let currentCategory = 'All';
+    let searchTerm = '';
+
+    // Get unique categories
+    function getCategories() {
+      const cats = new Set(allApps.map(a => a.category));
+      return ['All', ...Array.from(cats).sort()];
+    }
+
+    // Filter apps
+    function filterApps() {
+      return allApps.filter(app => {
+        const matchesSearch = !searchTerm ||
+          app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.url.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = currentCategory === 'All' || app.category === currentCategory;
+        return matchesSearch && matchesCategory;
+      });
+    }
+
+    // Render tabs
+    function renderTabs() {
+      const tabs = document.getElementById('tabs');
+      tabs.innerHTML = getCategories().map(cat =>
+        `<button class="tab ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">${cat}</button>`
+      ).join('');
+    }
+
+    // Render apps
+    function renderApps() {
+      const filtered = filterApps();
+      const content = document.getElementById('content');
+      const count = document.getElementById('count');
+
+      count.textContent = `${filtered.length} app${filtered.length !== 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        content.innerHTML = '<div class="empty">No apps found</div>';
+        return;
+      }
+
+      // Group by category if showing all
+      if (currentCategory === 'All' && !searchTerm) {
+        const grouped = {};
+        filtered.forEach(app => {
+          if (!grouped[app.category]) grouped[app.category] = [];
+          grouped[app.category].push(app);
+        });
+
+        content.innerHTML = Object.entries(grouped)
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([cat, apps]) => `
+            <div class="category">
+              <div class="category-title">${cat} (${apps.length})</div>
+              <div class="app-list">
+                ${apps.slice(0, 20).map(renderAppCard).join('')}
+                ${apps.length > 20 ? `<div style="color:#666;font-size:13px;padding:8px;">+${apps.length - 20} more - search to find</div>` : ''}
+              </div>
+            </div>
+          `).join('');
+      } else {
+        content.innerHTML = `
+          <div class="app-list">
+            ${filtered.slice(0, 50).map(renderAppCard).join('')}
+            ${filtered.length > 50 ? `<div style="color:#666;font-size:13px;padding:8px;text-align:center;">Showing 50 of ${filtered.length} - refine search</div>` : ''}
+          </div>
+        `;
+      }
+    }
+
+    function renderAppCard(app) {
+      const shortUrl = app.url.replace('https://', '').replace('http://', '');
+      return `
+        <div class="app-card">
+          <div class="app-info">
+            <div class="app-name">${app.name}</div>
+            <div class="app-url">${shortUrl}</div>
+          </div>
+          <div class="app-actions">
+            <button class="btn btn-copy" onclick="copyLink('${app.url}', this)">Copy</button>
+            <button class="btn btn-sms" onclick="shareSMS('${app.url}', '${app.name}')">SMS</button>
+            <a href="${app.url}" target="_blank" class="btn btn-open">↗</a>
+          </div>
+        </div>
+      `;
+    }
+
+    // Actions
+    function setCategory(cat) {
+      currentCategory = cat;
+      renderTabs();
+      renderApps();
+    }
+
+    function copyLink(url, btn) {
+      navigator.clipboard.writeText(url).then(() => {
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+        showToast('Link copied!');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function shareSMS(url, name) {
+      const msg = `Check out ${name}: ${url}`;
+      window.location.href = `sms:?body=${encodeURIComponent(msg)}`;
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function addToHome() {
+      alert('On iPhone: Tap Share → Add to Home Screen\n\nOn Android: Tap Menu → Add to Home Screen');
+    }
+
+    // Search handler
+    document.getElementById('search').addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      renderApps();
+    });
+
+    // Init
+    renderTabs();
+    renderApps();
+  </script>
+</body>
+</html>

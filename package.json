@@ -1,0 +1,12 @@
+{
+  "name": "app-hub",
+  "version": "1.0.0",
+  "description": "Universal app link hub for quick sharing",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "npm run build && npx serve dist -p 3200"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
