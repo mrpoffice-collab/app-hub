@@ -1,0 +1,44 @@
+name: Update App Registry
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+
+  # Scheduled - daily at midnight
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout code63-app registry
+        uses: actions/checkout@v4
+        with:
+          repository: mrpoffice-collab/code63apps
+          path: code63-app
+          sparse-checkout: src/lib/app-registry.ts
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build with latest registry
+        run: |
+          # Copy registry to expected location
+          mkdir -p ../code63-app/src/lib
+          cp code63-app/src/lib/app-registry.ts ../code63-app/src/lib/
+          node build.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "Auto-update app registry $(date +%Y-%m-%d)"
+          git push
