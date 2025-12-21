@@ -211,9 +211,40 @@
 </head>
 <body>
   <div class="header">
-    <h1>🚀 My Apps</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h1>🚀 My Apps</h1>
+      <button onclick="showHelp()" style="background:none;border:none;color:#888;font-size:13px;cursor:pointer;">How to update ⓘ</button>
+    </div>
     <input type="search" class="search" id="search" placeholder="Search all apps..." autocomplete="off">
     <div class="tabs" id="tabs"></div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;padding:20px;overflow-y:auto;">
+    <div style="max-width:400px;margin:40px auto;background:#16213e;border-radius:16px;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="color:#e94560;font-size:18px;">How to Update</h2>
+        <button onclick="hideHelp()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">×</button>
+      </div>
+
+      <div style="color:#ccc;font-size:14px;line-height:1.6;">
+        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Adding Code63 apps?</strong><br>
+        They auto-sync daily. Or trigger manually at:<br>
+        <a href="https://github.com/mrpoffice-collab/app-hub/actions" target="_blank" style="color:#4fc3f7;">GitHub Actions → Run workflow</a></p>
+
+        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Adding standalone apps?</strong><br>
+        1. Edit <code style="background:#0f3460;padding:2px 6px;border-radius:4px;">MY_APPS</code> in index.html<br>
+        2. Double-click <code style="background:#0f3460;padding:2px 6px;border-radius:4px;">update.bat</code></p>
+
+        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Files location:</strong><br>
+        <code style="background:#0f3460;padding:2px 6px;border-radius:4px;font-size:12px;">C:\Users\mrpof\APPS Homemade\app-hub\</code></p>
+
+        <p><strong style="color:#e94560;">Quick update command:</strong></p>
+        <code style="display:block;background:#0f3460;padding:10px;border-radius:6px;font-size:11px;margin-top:8px;word-break:break-all;">cd app-hub && node build.js && git add -A && git commit -m "Update" && git push</code>
+      </div>
+
+      <button onclick="hideHelp()" style="width:100%;margin-top:20px;padding:14px;background:#e94560;color:white;border:none;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;">Got it</button>
+    </div>
   </div>
 
   <div class="count" id="count"></div>
@@ -395,6 +426,14 @@
 
     function addToHome() {
       alert('On iPhone: Tap Share → Add to Home Screen\n\nOn Android: Tap Menu → Add to Home Screen');
+    }
+
+    function showHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+
+    function hideHelp() {
+      document.getElementById('helpModal').style.display = 'none';
     }
 
     // Search handler
