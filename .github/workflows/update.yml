@@ -46,3 +46,9 @@ jobs:
           git add -A
           git diff --staged --quiet || git commit -m "Auto-update app registry $(date +%Y-%m-%d)"
           git push
+
+      - name: Deploy to Vercel
+        run: npx vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: team_uEuqvkH5xgJ4YmhTsci6wQNW
+          VERCEL_PROJECT_ID: prj_Qv2YFoBR6UTLCfBDNsEis4TZG4xh
