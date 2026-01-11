@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CODE63_PAT }}
 
       - name: Checkout code63-app registry
         uses: actions/checkout@v4
@@ -36,8 +36,11 @@ jobs:
           cp code63-app/src/lib/app-registry.ts ../code63-app/src/lib/
           node build.js
 
-      - name: Commit and push if changed
+      - name: Cleanup and commit
         run: |
+          # Remove the temp checkout before committing
+          rm -rf code63-app
+
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add -A
