@@ -46,41 +46,8 @@
     .search::placeholder {
       color: #666;
     }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tab {
-      padding: 8px 16px;
-      background: #0f3460;
-      border: none;
-      border-radius: 20px;
-      color: #aaa;
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .tab.active {
-      background: #e94560;
-      color: white;
-    }
     .content {
       padding: 16px;
-    }
-    .category {
-      margin-bottom: 24px;
-    }
-    .category-title {
-      font-size: 14px;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      padding-left: 4px;
     }
     .app-list {
       display: flex;
@@ -211,40 +178,8 @@
 </head>
 <body>
   <div class="header">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <h1>🚀 My Apps</h1>
-      <button onclick="showHelp()" style="background:none;border:none;color:#888;font-size:13px;cursor:pointer;">How to update ⓘ</button>
-    </div>
-    <input type="search" class="search" id="search" placeholder="Search all apps..." autocomplete="off">
-    <div class="tabs" id="tabs"></div>
-  </div>
-
-  <!-- Help Modal -->
-  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;padding:20px;overflow-y:auto;">
-    <div style="max-width:400px;margin:40px auto;background:#16213e;border-radius:16px;padding:24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="color:#e94560;font-size:18px;">How to Update</h2>
-        <button onclick="hideHelp()" style="background:none;border:none;color:#888;font-size:24px;cursor:pointer;">×</button>
-      </div>
-
-      <div style="color:#ccc;font-size:14px;line-height:1.6;">
-        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Adding Code63 apps?</strong><br>
-        They auto-sync daily. Or trigger manually at:<br>
-        <a href="https://github.com/mrpoffice-collab/app-hub/actions" target="_blank" style="color:#4fc3f7;">GitHub Actions → Run workflow</a></p>
-
-        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Adding standalone apps?</strong><br>
-        1. Edit <code style="background:#0f3460;padding:2px 6px;border-radius:4px;">MY_APPS</code> in index.html<br>
-        2. Double-click <code style="background:#0f3460;padding:2px 6px;border-radius:4px;">update.bat</code></p>
-
-        <p style="margin-bottom:16px;"><strong style="color:#e94560;">Files location:</strong><br>
-        <code style="background:#0f3460;padding:2px 6px;border-radius:4px;font-size:12px;">C:\Users\mrpof\APPS Homemade\app-hub\</code></p>
-
-        <p><strong style="color:#e94560;">Quick update command:</strong></p>
-        <code style="display:block;background:#0f3460;padding:10px;border-radius:6px;font-size:11px;margin-top:8px;word-break:break-all;">cd app-hub && node build.js && git add -A && git commit -m "Update" && git push</code>
-      </div>
-
-      <button onclick="hideHelp()" style="width:100%;margin-top:20px;padding:14px;background:#e94560;color:white;border:none;border-radius:10px;font-weight:600;font-size:16px;cursor:pointer;">Got it</button>
-    </div>
+    <h1>My Apps</h1>
+    <input type="search" class="search" id="search" placeholder="Search apps..." autocomplete="off">
   </div>
 
   <div class="count" id="count"></div>
@@ -258,81 +193,19 @@
   </div>
 
   <script>
-    // ============================================
-    // APP REGISTRY - Add your apps here!
-    // ============================================
-    const MY_APPS = [
-      // ===== MY STANDALONE APPS =====
-      { name: "Track My Client (CRM)", url: "https://track-my-client.vercel.app", category: "Business" },
-      { name: "Firefly Grove", url: "https://firefly-grove-meschelles-projects.vercel.app", category: "Creative" },
-      { name: "Whisper Journals", url: "https://whisper-journals.vercel.app", category: "Personal" },
-      { name: "Whispering Art", url: "https://whispering-art.vercel.app", category: "Creative" },
-      { name: "Code63 Art", url: "https://www.code63.art", category: "Creative" },
-      { name: "AISO Studio", url: "https://aiso.studio", category: "Creative" },
-      { name: "Cardulary", url: "https://cardulary.com", category: "Tools" },
-      { name: "Spondulic", url: "https://spondulic.vercel.app", category: "Finance" },
-      { name: "Code63 Box", url: "https://code63box.vercel.app", category: "Tools" },
-      { name: "Chore Race", url: "https://chore-race.vercel.app", category: "Family" },
-      { name: "Jotto", url: "https://jotto-xi.vercel.app", category: "Games" },
-      { name: "Polite Fury", url: "https://polite-fury.vercel.app", category: "Tools" },
-      { name: "Skit Maker", url: "https://skit-maker.vercel.app", category: "Creative" },
-      { name: "Rhythm Planner", url: "https://rhythm-planner.vercel.app", category: "Personal" },
-      { name: "CCS", url: "https://ccs-five.vercel.app", category: "Tools" },
-      { name: "Crawl Simulator", url: "https://crawl-simulator.vercel.app", category: "Tools" },
-
-      // ===== CODE63 PORTALS =====
-      { name: "Code63 Apps (600+ tools)", url: "https://www.code63apps.com", category: "Portals" },
-      { name: "Code63 Share Hub", url: "https://code63apps.com/share", category: "Portals" },
-    ];
-
-    // Code63 individual apps - loaded dynamically
-    const CODE63_APPS = REGISTERED_APPS_PLACEHOLDER;
-
-    // Combine all apps
-    let allApps = [...MY_APPS];
-
-    // Add Code63 apps with proper URLs
-    if (Array.isArray(CODE63_APPS) && CODE63_APPS.length > 0) {
-      CODE63_APPS.forEach(slug => {
-        allApps.push({
-          name: formatName(slug),
-          url: `https://code63apps.com/apps/${slug}`,
-          category: "Code63"
-        });
-      });
-    }
-
-    function formatName(slug) {
-      return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    }
-
-    // State
-    let currentCategory = 'All';
-    let searchTerm = '';
-
-    // Get unique categories
-    function getCategories() {
-      const cats = new Set(allApps.map(a => a.category));
-      return ['All', ...Array.from(cats).sort()];
-    }
+    // Auto-populated from Vercel API
+    const VERCEL_APPS = [];
 
     // Filter apps
-    function filterApps() {
-      return allApps.filter(app => {
-        const matchesSearch = !searchTerm ||
-          app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.url.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = currentCategory === 'All' || app.category === currentCategory;
-        return matchesSearch && matchesCategory;
-      });
-    }
+    let searchTerm = '';
 
-    // Render tabs
-    function renderTabs() {
-      const tabs = document.getElementById('tabs');
-      tabs.innerHTML = getCategories().map(cat =>
-        `<button class="tab ${cat === currentCategory ? 'active' : ''}" onclick="setCategory('${cat}')">${cat}</button>`
-      ).join('');
+    function filterApps() {
+      return VERCEL_APPS.filter(app => {
+        return !searchTerm ||
+          app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.url.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (app.slug && app.slug.toLowerCase().includes(searchTerm.toLowerCase()));
+      });
     }
 
     // Render apps
@@ -348,33 +221,11 @@
         return;
       }
 
-      // Group by category if showing all
-      if (currentCategory === 'All' && !searchTerm) {
-        const grouped = {};
-        filtered.forEach(app => {
-          if (!grouped[app.category]) grouped[app.category] = [];
-          grouped[app.category].push(app);
-        });
-
-        content.innerHTML = Object.entries(grouped)
-          .sort((a, b) => a[0].localeCompare(b[0]))
-          .map(([cat, apps]) => `
-            <div class="category">
-              <div class="category-title">${cat} (${apps.length})</div>
-              <div class="app-list">
-                ${apps.slice(0, 20).map(renderAppCard).join('')}
-                ${apps.length > 20 ? `<div style="color:#666;font-size:13px;padding:8px;">+${apps.length - 20} more - search to find</div>` : ''}
-              </div>
-            </div>
-          `).join('');
-      } else {
-        content.innerHTML = `
-          <div class="app-list">
-            ${filtered.slice(0, 50).map(renderAppCard).join('')}
-            ${filtered.length > 50 ? `<div style="color:#666;font-size:13px;padding:8px;text-align:center;">Showing 50 of ${filtered.length} - refine search</div>` : ''}
-          </div>
-        `;
-      }
+      content.innerHTML = `
+        <div class="app-list">
+          ${filtered.map(renderAppCard).join('')}
+        </div>
+      `;
     }
 
     function renderAppCard(app) {
@@ -388,19 +239,13 @@
           <div class="app-actions">
             <button class="btn btn-copy" onclick="copyLink('${app.url}', this)">Copy</button>
             <button class="btn btn-sms" onclick="shareSMS('${app.url}', '${app.name}')">SMS</button>
-            <a href="${app.url}" target="_blank" class="btn btn-open">↗</a>
+            <a href="${app.url}" target="_blank" class="btn btn-open">Open</a>
           </div>
         </div>
       `;
     }
 
     // Actions
-    function setCategory(cat) {
-      currentCategory = cat;
-      renderTabs();
-      renderApps();
-    }
-
     function copyLink(url, btn) {
       navigator.clipboard.writeText(url).then(() => {
         btn.textContent = '✓';
@@ -429,14 +274,6 @@
       alert('On iPhone: Tap Share → Add to Home Screen\n\nOn Android: Tap Menu → Add to Home Screen');
     }
 
-    function showHelp() {
-      document.getElementById('helpModal').style.display = 'block';
-    }
-
-    function hideHelp() {
-      document.getElementById('helpModal').style.display = 'none';
-    }
-
     // Search handler
     document.getElementById('search').addEventListener('input', (e) => {
       searchTerm = e.target.value;
@@ -444,7 +281,6 @@
     });
 
     // Init
-    renderTabs();
     renderApps();
   </script>
 </body>

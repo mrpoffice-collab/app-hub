@@ -1,12 +1,9 @@
-name: Update App Registry
+name: Update App Hub
 
 on:
-  # Manual trigger
   workflow_dispatch:
-
-  # Scheduled - daily at midnight
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # Daily at midnight
 
 jobs:
   update:
@@ -16,35 +13,22 @@ jobs:
         with:
           token: ${{ secrets.CODE63_PAT }}
 
-      - name: Checkout code63-app registry
-        uses: actions/checkout@v4
-        with:
-          repository: mrpoffice-collab/code63apps
-          token: ${{ secrets.CODE63_PAT }}
-          path: code63-app
-          sparse-checkout: src/lib/app-registry.ts
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Build with latest registry
-        run: |
-          # Copy registry to expected location
-          mkdir -p ../code63-app/src/lib
-          cp code63-app/src/lib/app-registry.ts ../code63-app/src/lib/
-          node build.js
+      - name: Build from Vercel API
+        run: node build.js
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Cleanup and commit
+      - name: Commit and push if changed
         run: |
-          # Remove the temp checkout before committing
-          rm -rf code63-app
-
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add -A
-          git diff --staged --quiet || git commit -m "Auto-update app registry $(date +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "Auto-update apps $(date +%Y-%m-%d)"
           git push
 
       - name: Deploy to Vercel
