@@ -4,6 +4,12 @@ const path = require('path');
 async function build() {
   let apps = [];
 
+  // Apps to exclude from the list
+  const EXCLUDE_APPS = ['code63app', 'code63-app', 'app-hub'];
+
+  // Force .vercel.app domain for these (custom domain points elsewhere)
+  const FORCE_VERCEL_DOMAIN = ['aiso-studio', 'strategyforge'];
+
   // Fetch all projects from Vercel API
   const vercelToken = process.env.VERCEL_TOKEN;
 
@@ -35,14 +41,18 @@ async function build() {
 
       // Convert to app entries
       for (const project of allProjects) {
-        // Skip app-hub itself
-        if (project.name === 'app-hub') continue;
+        // Skip excluded apps
+        if (EXCLUDE_APPS.includes(project.name)) continue;
 
         // Get the production domain
         let domain = null;
 
-        // Check for custom domains first
-        if (project.alias && project.alias.length > 0) {
+        // Check if this app should force .vercel.app domain
+        if (FORCE_VERCEL_DOMAIN.includes(project.name)) {
+          domain = project.name + '.vercel.app';
+        }
+        // Otherwise check for custom domains
+        else if (project.alias && project.alias.length > 0) {
           // Prefer custom domains over .vercel.app
           const customDomain = project.alias.find(a => !a.includes('vercel.app'));
           domain = customDomain || project.alias[0];
