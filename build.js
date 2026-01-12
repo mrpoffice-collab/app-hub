@@ -12,7 +12,8 @@ async function build() {
   const DOMAIN_OVERRIDES = {
     'strategyforge': 'strategyforge-meschelles-projects.vercel.app',
     'aiso-studio': 'aiso-studio-meschelles-projects.vercel.app',
-    'waitlist-pro': 'waitlist-pro-meschelles-projects.vercel.app'
+    'waitlist-pro': 'waitlist-pro-meschelles-projects.vercel.app',
+    'content-mod': 'content-mod-meschelles-projects.vercel.app'
   };
 
   // Fetch all projects from Vercel API
