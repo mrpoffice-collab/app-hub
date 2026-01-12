@@ -11,7 +11,8 @@ async function build() {
   // Map project names to their correct domains (team-scoped when plain name is taken)
   const DOMAIN_OVERRIDES = {
     'strategyforge': 'strategyforge-meschelles-projects.vercel.app',
-    'aiso-studio': 'aiso-studio-meschelles-projects.vercel.app'
+    'aiso-studio': 'aiso-studio-meschelles-projects.vercel.app',
+    'waitlist-pro': 'waitlist-pro-meschelles-projects.vercel.app'
   };
 
   // Fetch all projects from Vercel API
