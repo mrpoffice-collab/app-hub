@@ -8,7 +8,11 @@ async function build() {
   const EXCLUDE_APPS = ['code63app', 'code63-app', 'app-hub'];
 
   // Force .vercel.app domain for these (custom domain points elsewhere)
-  const FORCE_VERCEL_DOMAIN = ['aiso-studio', 'strategyforge'];
+  // Map project names to their correct domains (team-scoped when plain name is taken)
+  const DOMAIN_OVERRIDES = {
+    'strategyforge': 'strategyforge-meschelles-projects.vercel.app',
+    'aiso-studio': 'aiso-studio-meschelles-projects.vercel.app'
+  };
 
   // Fetch all projects from Vercel API
   const vercelToken = process.env.VERCEL_TOKEN;
@@ -47,9 +51,9 @@ async function build() {
         // Get the production domain
         let domain = null;
 
-        // Check if this app should force .vercel.app domain
-        if (FORCE_VERCEL_DOMAIN.includes(project.name)) {
-          domain = project.name + '.vercel.app';
+        // Check if this app should has a domain override
+        if (DOMAIN_OVERRIDES[project.name]) {
+          domain = DOMAIN_OVERRIDES[project.name];
         }
         // Otherwise check for custom domains
         else if (project.alias && project.alias.length > 0) {
